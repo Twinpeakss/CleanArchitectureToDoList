@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Domain.Entities
+﻿namespace Domain.Entities
 {
+    using System.Collections.Generic;
+
     public class ToDoList
     {
         public int Id { get; set; }

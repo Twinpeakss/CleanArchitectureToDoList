@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Domain.Entities
+﻿namespace Domain.Entities
 {
+    using System;
+
     public class ToDoItem
     {
         public int Id { get; set; }
