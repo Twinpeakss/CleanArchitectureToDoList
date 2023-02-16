@@ -8,8 +8,6 @@
 
         public string Note { get; set; }
 
-        public string Title { get; set; }
-
         public DateTime CreationTime { get; set; }
 
         public bool Done { get; set; }
