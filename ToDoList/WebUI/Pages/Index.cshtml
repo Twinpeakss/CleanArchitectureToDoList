@@ -62,8 +62,8 @@
                                             <td>@todo.Note</td>
                                             <td>@boolStatusConverter(@todo.Done)</td>
                                             <td>
-                                                <button type="submit" asp-page-handler="Delete" class="btn btn-danger">Delete</button>
-                                                <button type="submit" asp-page-handler="MarkAsDone" class="btn btn-success ms-1">Finished</button>
+                                                <button type="submit" asp-page-handler="Delete" asp-route-id="@todo.Id" class="btn btn-danger">Delete</button>
+                                                <button type="submit" asp-page-handler="MarkAsDone" asp-route-id="@todo.Id" class="btn btn-success ms-1">Finished</button>
                                             </td>
                                         </tr>
                                     }

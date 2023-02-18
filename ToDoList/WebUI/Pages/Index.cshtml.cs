@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,65 +9,64 @@ namespace WebUI.Pages
 {
     public class IndexModel : PageModel
     {
-        private static int _autoId = 1;
-
-        private static int GenerateId()
-        {
-            return _autoId++;
-        }
-
-        public List<ToDo> ToDos { get; set; } = new List<ToDo>();
+        private readonly ToDoDbContext _context;
 
         [BindProperty]
         public ToDo ToDo { get; set; }
 
-        public void OnGetAsync()
+        public IList<ToDo> ToDos { get; set; } = new List<ToDo>();
+
+        public IndexModel(ToDoDbContext context)
         {
-            FillToDos();
+            _context = context;
         }
 
-        public IActionResult OnPostAsync(ToDo toDo)
+        public async void OnGetAsync()
+        {
+            if (_context.ToDos.Any())
+            {
+                ToDos = await _context.ToDos.ToListAsync();
+            }
+        }
+
+        public async Task<IActionResult> OnPostAsync(ToDo toDo)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            ToDos.Add(toDo);
+            _context.ToDos.Add(toDo);
+            await _context.SaveChangesAsync();
 
             return RedirectToPage();
         }
 
-        public IActionResult OnPostDeleteAsync(int id)
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            if (!ModelState.IsValid)
+            var todo = await _context.ToDos.FindAsync(id);
+
+            if (todo != null)
             {
-                return Page();
+                _context.ToDos.Remove(todo);
+                await _context.SaveChangesAsync();
             }
 
-            ToDos.Remove(new ToDo { Id = id });
-
             return RedirectToPage();
         }
 
-        public IActionResult OnPostMarkAsDoneAsync(int id)
+        public async Task<IActionResult> OnPostMarkAsDoneAsync(int id)
         {
-            if (!ModelState.IsValid)
+            var todo = await _context.ToDos.FindAsync(id);
+
+            if (todo != null)
             {
-                return Page();
+                todo.Done = true;
+                _context.ToDos.Update(todo);
+                await _context.SaveChangesAsync();
             }
 
-            var toDo = ToDos.FirstOrDefault(t => t.Id == id);
-
-            toDo.Done = true;
-
             return RedirectToPage();
-        }
-
-        private void FillToDos()
-        {
-            ToDos.Add(new ToDo { Id = GenerateId(), Note = "Eat pizza" });
-            ToDos.Add(new ToDo { Id = GenerateId(), Note = "Drink a water", Done = true });
         }
     }
 }
