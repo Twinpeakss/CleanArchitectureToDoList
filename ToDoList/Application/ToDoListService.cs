@@ -1,29 +1,36 @@
 ﻿namespace Application
 {
-    using System;
     using Application.Interfaces;
+    using Contracts.Persistence;
     using Domain.Entities;
 
     public class ToDoListService : IToDoListService
     {
+        private readonly IToDoRepository toDoRepository;
+
+        public ToDoListService(IToDoRepository toDoRepository)
+        {
+            this.toDoRepository = toDoRepository;
+        }
+
         public void AddToDo(ToDoItem toDo)
         {
-            throw new NotImplementedException();
+            toDoRepository.AddToDo(toDo);
         }
 
         public void DeleteToDo(ToDoItem toDo)
         {
-            throw new NotImplementedException();
+            toDoRepository.DeleteToDo(toDo);
         }
 
         public void MarkToDoAsDone(ToDoItem toDo)
         {
-            throw new NotImplementedException();
+            toDoRepository.MarkToDoAsDone(toDo);
         }
 
         public void UpdateToDo(ToDoItem toDo)
         {
-            throw new NotImplementedException();
+            toDoRepository.UpdateToDo(toDo);
         }
     }
 }
