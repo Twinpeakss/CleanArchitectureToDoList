@@ -1,69 +1,71 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.Interfaces;
+using AutoMapper;
+using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebUI.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ToDoDbContext _context;
+        private readonly IToDoListService _toDoListService;
+
+        private readonly IMapper _mapper;
 
         [BindProperty]
         public ToDo ToDo { get; set; }
 
         public IList<ToDo> ToDos { get; set; } = new List<ToDo>();
 
-        public IndexModel(ToDoDbContext context)
+        public IndexModel(IToDoListService toDoRepository,
+                          IMapper mapper)
         {
-            _context = context;
+            _toDoListService = toDoRepository;
+            _mapper = mapper;
         }
 
-        public async void OnGetAsync()
+        public void OnGetAsync()
         {
-            if (_context.ToDos.Any())
-            {
-                ToDos = await _context.ToDos.ToListAsync();
-            }
+            var collection = _toDoListService.GetAllToDos();
+            var mapped = _mapper.Map<ToDoItem>(collection);
+            ToDos = (IList<ToDo>)mapped;
         }
 
-        public async Task<IActionResult> OnPostAsync(ToDo toDo)
+        public IActionResult OnPostAsync(ToDo toDo)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.ToDos.Add(toDo);
-            await _context.SaveChangesAsync();
+            _toDoListService.AddToDo(_mapper.Map<ToDoItem>(toDo));
 
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        public IActionResult OnPostDeleteAsync(ToDo toDo)
         {
-            var todo = await _context.ToDos.FindAsync(id);
+            var dto = _mapper.Map<ToDoItem>(toDo);
+            var todo = _toDoListService.FindToDo(dto);
 
             if (todo != null)
             {
-                _context.ToDos.Remove(todo);
-                await _context.SaveChangesAsync();
+                _toDoListService.DeleteToDo(dto);
             }
 
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostMarkAsDoneAsync(int id)
+        public IActionResult OnPostMarkAsDoneAsync(ToDo toDo)
         {
-            var todo = await _context.ToDos.FindAsync(id);
+            var dto = _mapper.Map<ToDoItem>(toDo);
+            var todo = _toDoListService.FindToDo(dto);
 
             if (todo != null)
             {
                 todo.Done = true;
-                _context.ToDos.Update(todo);
-                await _context.SaveChangesAsync();
+                _toDoListService.MarkToDoAsDone(dto);
             }
 
             return RedirectToPage();

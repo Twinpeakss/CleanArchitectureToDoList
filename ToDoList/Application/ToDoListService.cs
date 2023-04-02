@@ -3,6 +3,7 @@
     using Application.Interfaces;
     using Contracts.Persistence;
     using Domain.Entities;
+    using System.Collections.Generic;
 
     public class ToDoListService : IToDoListService
     {
@@ -21,6 +22,16 @@
         public void DeleteToDo(ToDoItem toDo)
         {
             toDoRepository.DeleteToDo(toDo);
+        }
+
+        public ToDoItem FindToDo(ToDoItem toDo)
+        {
+            return toDoRepository.FindToDo(toDo);
+        }
+
+        public IEnumerable<ToDoItem> GetAllToDos()
+        {
+            return toDoRepository.GetAllToDos();
         }
 
         public void MarkToDoAsDone(ToDoItem toDo)

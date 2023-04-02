@@ -1,33 +1,50 @@
-﻿using System;
-using Contracts.Persistence;
+﻿using Contracts.Persistence;
 using Domain.Entities;
+using System.Collections.Generic;
 
 namespace Repository
 {
     public class ToDoRepository : IToDoRepository
     {
-        public ToDoRepository()
+        public readonly ToDoContext _toDoContext;
+
+        public ToDoRepository(ToDoContext toDoContext)
         {
+            _toDoContext = toDoContext;
         }
 
-        public void AddToDo(ToDoItem entity)
+        public async void AddToDo(ToDoItem entity)
         {
-            throw new NotImplementedException();
+            await _toDoContext.AddAsync(entity);
+            await _toDoContext.SaveChangesAsync();
         }
 
-        public void DeleteToDo(ToDoItem entity)
+        public async void DeleteToDo(ToDoItem entity)
         {
-            throw new NotImplementedException();
+            _toDoContext.Remove(entity);
+            await _toDoContext.SaveChangesAsync();
         }
 
-        public void MarkToDoAsDone(ToDoItem entity)
+        public ToDoItem FindToDo(ToDoItem entity)
         {
-            throw new NotImplementedException();
+            return _toDoContext.Find<ToDoItem>(entity);
         }
 
-        public void UpdateToDo(ToDoItem entity)
+        public IEnumerable<ToDoItem> GetAllToDos()
         {
-            throw new NotImplementedException();
+            return _toDoContext.toDoItems;
+        }
+
+        public async void MarkToDoAsDone(ToDoItem entity)
+        {
+            _toDoContext.Update(entity);
+            await _toDoContext.SaveChangesAsync();
+        }
+
+        public async void UpdateToDo(ToDoItem entity)
+        {
+            _toDoContext.Update(entity);
+            await _toDoContext.SaveChangesAsync();
         }
     }
 }

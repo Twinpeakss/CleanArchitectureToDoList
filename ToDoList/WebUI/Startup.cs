@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebUI.Configuration;
+using AutoMapper;
 
 namespace WebUI
 {
@@ -21,8 +23,16 @@ namespace WebUI
         {
             services.AddRazorPages();
 
-            services.AddDbContext<ToDoDbContext>(options =>
-                      options.UseInMemoryDatabase("TodoList"));
+            //mappers
+            var config = new MapperConfiguration(
+                cfg =>
+                {
+                    cfg.AddProfile<UiMappingProfile>();
+                });
+
+            var mapper = new Mapper(config);
+
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
